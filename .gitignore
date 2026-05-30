@@ -42,7 +42,6 @@ app-example
 /ios
 /android
 
-.drizzle/
 .claude/
 .vscode/
 AGENT.md

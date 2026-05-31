@@ -3,7 +3,7 @@ import * as SecureStore from 'expo-secure-store'
 import { Alert } from 'react-native'
 
 const OPENROUTER_URI = "https://openrouter.ai/api/v1/chat/completions"
-const OPENROUTER_API_KEY = "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"
+const OPENROUTER_API_KEY = ""
 const MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
 //"minimax/minimax-m2.5:free"
 

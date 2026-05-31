@@ -202,7 +202,7 @@ const settings = () => {
                                 <Feather name="terminal" size={16} color={color.primary} />
                             </View>
                             <View>
-                                <Text style={[styles.rowTitle, { color: color.text }]}>DevSnippets</Text>
+                                <Text style={[styles.rowTitle, { color: color.primary }]}>SnipVault</Text>
                                 <Text style={[styles.rowSubtitle, { color: color.placeholder }]}>Version 1.0.0</Text>
                             </View>
                         </View>

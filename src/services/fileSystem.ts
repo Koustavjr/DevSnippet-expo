@@ -3,9 +3,9 @@ import { Directory, File, Paths } from 'expo-file-system';
 import { Alert } from 'react-native';
 
 const DIRECTORIES = {
-    exports: new Directory(Paths.document, "/exports"),
-    templates: new Directory(Paths.document, "/templates"),
-    attachments: new Directory(Paths.document, "/attachments")
+    exports: new Directory(Paths.document, "exports"),
+    templates: new Directory(Paths.document, "templates"),
+    attachments: new Directory(Paths.document, "attachments")
 
 }
 
@@ -107,7 +107,8 @@ export const deleteFile = async (fileId: number) => {
         }
 
         const fileObj = new File(file.path)
-        await fileObj.delete()
+        if (fileObj.exists)
+            await fileObj.delete()
         await deleteFileRecord(fileId)
     } catch (error) {
         console.error("Error deleting file:", error);
@@ -131,11 +132,15 @@ export const moveFile = async (fileId: number, destination: 'exports' | 'templat
             Alert.alert("Error", "Invalid destination directory")
             return
         }
-
-        const dest = new File(dir, file.name)
+        if (!fileObj.exists) {
+            Alert.alert('Error', 'File not found')
+            return
+        }
+        const safeName = file.name.replace(/\s+/g, '_')
+        const dest = new File(dir, safeName)
         fileObj.move(dest)
 
-        await updateFilePath(fileId, dest.uri)
+        await updateFilePath(fileId, dest.uri, destination)
     }
     catch (error) {
         console.error("Error moving file:", error);
@@ -146,6 +151,7 @@ export const moveFile = async (fileId: number, destination: 'exports' | 'templat
 
 export const copyFile = async (fileId: number, destination: 'exports' | 'templates') => {
     try {
+        const typeMap = { exports: 'code', templates: 'template' } as const
         const file = await getFileById(fileId)
         if (!file) {
             Alert.alert("Error", "File not found")
@@ -158,11 +164,25 @@ export const copyFile = async (fileId: number, destination: 'exports' | 'templat
             Alert.alert("Error", "Invalid destination directory")
             return
         }
-
-        const dest = new File(dir, file.name)
+        if (!fileObj.exists) {
+            Alert.alert("Error", "File not found")
+            return
+        }
+        const safeName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}` // to remvoe spaces
+        const newFileName = `${Date.now()}_${safeName}`
+        const dest = new File(dir, newFileName)
         fileObj.copy(dest)
 
-        await updateFilePath(fileId, dest.uri)
+        // await updateFilePath(fileId, dest.uri)
+        const record = await createFileRecord({
+            name: newFileName,
+            path: dest.uri,
+            snippet_id: null,
+            size: dest.size ?? 0,
+            type: typeMap[destination]
+        })
+
+        return record
     }
     catch (error) {
         console.error("Error moving file:", error);

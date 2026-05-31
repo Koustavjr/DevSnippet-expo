@@ -14,6 +14,7 @@ import {
     Alert,
     Animated,
     Image,
+    Modal,
     Platform,
     ScrollView,
     StyleSheet,
@@ -23,6 +24,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import markdownToTxt from 'markdown-to-txt';
+import CodeHighlighter from "react-native-code-highlighter";
+import { atomOneDarkReasonable } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 
 export default function SnippetsDetail() {
@@ -41,7 +45,7 @@ export default function SnippetsDetail() {
     const [aiResponse, setAiResponse] = useState<string | null>(null)
     const [aiLoading, setAiLoading] = useState(false)
     const [activeAiAction, setActiveAiAction] = useState<AIAction | null>(null)
-
+    const [exportModal, setExportModal] = useState(false)
     const aiExpandAnim = useRef(new Animated.Value(0)).current
     const color = Colors[theme]
 
@@ -139,6 +143,7 @@ export default function SnippetsDetail() {
             'Export Snippet',
             'Choose a format',
             [
+                { text: 'Cancel', style: 'cancel' },
                 {
                     text: '.js',
                     onPress: async () => {
@@ -159,8 +164,7 @@ export default function SnippetsDetail() {
                         await exportSnippetAsFile(snippet.title, snippet.content, 'json')
                         Alert.alert('Exported', 'Snippet saved to exports folder')
                     }
-                },
-                { text: 'Cancel', style: 'cancel' }
+                }
             ]
         )
     }
@@ -176,10 +180,10 @@ export default function SnippetsDetail() {
             'Share Snippet',
             'Choose a format',
             [
+                { text: 'Cancel', style: 'cancel' },
                 { text: '.js', onPress: () => shareSnippetAsFile(snippet.title, snippet.content, 'js') },
                 { text: '.txt', onPress: () => shareSnippetAsFile(snippet.title, snippet.content, 'txt') },
-                { text: '.json', onPress: () => shareSnippetAsFile(snippet.title, snippet.content, 'json') },
-                { text: 'Cancel', style: 'cancel' }
+                { text: '.json', onPress: () => shareSnippetAsFile(snippet.title, snippet.content, 'json') }
             ]
         )
     }
@@ -282,7 +286,7 @@ export default function SnippetsDetail() {
     return (
         <SafeAreaView style={[styles.safeArea, { backgroundColor: color.background }]} edges={['top']}>
 
-            { }
+
             <View style={[styles.header, { borderBottomColor: color.border }]}>
                 <TouchableOpacity
                     onPress={() => router.back()}
@@ -307,14 +311,14 @@ export default function SnippetsDetail() {
                 </TouchableOpacity>
             </View>
 
-            { }
+
             <ScrollView
                 style={styles.scroll}
                 contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
                 showsVerticalScrollIndicator={false}
             >
 
-                { }
+
                 <View style={styles.metaRow}>
                     <View style={[styles.languageBadge, { backgroundColor: color.primary + '15' }]}>
                         <Feather name="code" size={12} color={color.primary} />
@@ -330,7 +334,7 @@ export default function SnippetsDetail() {
                     ))}
                 </View>
 
-                { }
+
                 <View style={[styles.codeContainer, { backgroundColor: theme === 'dark' ? '#0E1420' : '#F8FAFC', borderColor: color.border }]}>
                     <View style={[styles.codeHeader, { borderBottomColor: color.border }]}>
                         <View style={styles.codeDotsRow}>
@@ -342,14 +346,27 @@ export default function SnippetsDetail() {
                             {snippet.language || 'plaintext'}
                         </Text>
                     </View>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        <Text style={[styles.codeText, { color: theme === 'dark' ? '#CBD5E1' : '#334155' }]}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ width: "100%", flexGrow: 1 }}
+                    >
+                        {/* <Text style={[styles.codeText, { color: theme === 'dark' ? '#CBD5E1' : '#334155' }]}>
                             {snippet.content}
-                        </Text>
+                        </Text> */}
+                        <CodeHighlighter
+                            hljsStyle={atomOneDarkReasonable}
+
+                            containerStyle={[
+                                styles.innerCodeBlock,
+                                { backgroundColor: theme === 'dark' ? '#0E1420' : '#F8FAFC' }
+                            ]}>
+                            {snippet.content}
+                        </CodeHighlighter>
+
+
                     </ScrollView>
                 </View>
 
-                { }
+
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <Text style={[styles.sectionTitle, { color: color.text }]}>Attachments</Text>
@@ -388,11 +405,11 @@ export default function SnippetsDetail() {
                     )}
                 </View>
 
-                { }
+
                 <View style={styles.section}>
                     <Text style={[styles.sectionTitle, { color: color.text }]}>AI Assistant</Text>
 
-                    { }
+
                     <View style={styles.aiButtonsRow}>
                         {(['Summarize', 'Improve', 'Explain'] as AIAction[]).map(action => (
                             <TouchableOpacity
@@ -421,7 +438,7 @@ export default function SnippetsDetail() {
                         ))}
                     </View>
 
-                    { }
+
                     {aiLoading && (
                         <View style={[styles.aiResponseContainer, { backgroundColor: color.card, borderColor: color.border }]}>
                             <ActivityIndicator size="small" color={color.primary} />
@@ -431,7 +448,7 @@ export default function SnippetsDetail() {
                         </View>
                     )}
 
-                    { }
+
                     {aiResponse && !aiLoading && (
                         <Animated.View
                             style={[
@@ -460,8 +477,14 @@ export default function SnippetsDetail() {
                                     <Feather name="x" size={16} color={color.placeholder} />
                                 </TouchableOpacity>
                             </View>
-                            <Text style={[styles.aiResponseText, { color: color.text }]}>
+                            {/* <Text style={[styles.aiResponseText, { color: color.text }]}>
                                 {aiResponse}
+                            </Text> */}
+                            <Text
+                                selectable={true}
+                                style={{ fontSize: 14, lineHeight: 22, color: color.text }}
+                            >
+                                {markdownToTxt(aiResponse)}
                             </Text>
                         </Animated.View>
                     )}
@@ -469,7 +492,7 @@ export default function SnippetsDetail() {
 
             </ScrollView>
 
-            { }
+
             <View style={[styles.bottomActions, { backgroundColor: color.background, borderTopColor: color.border }]}>
                 <TouchableOpacity
                     style={[styles.actionBtn, { backgroundColor: color.card, borderColor: color.border }]}
@@ -481,7 +504,7 @@ export default function SnippetsDetail() {
 
                 <TouchableOpacity
                     style={[styles.actionBtn, { backgroundColor: color.card, borderColor: color.border }]}
-                    onPress={handleExport}
+                    onPress={() => { setExportModal(true) }}
                 >
                     <Feather name="download" size={18} color={color.primary} />
                     <Text style={[styles.actionBtnText, { color: color.text }]}>Export</Text>
@@ -503,12 +526,86 @@ export default function SnippetsDetail() {
                     <Text style={[styles.actionBtnText, { color: '#EF4444' }]}>Delete</Text>
                 </TouchableOpacity>
             </View>
+            <Modal
+                visible={exportModal}
+                transparent
+                animationType='fade'
+                onRequestClose={() => { setExportModal(false) }}
+                style={[styles.exportModalContainer, { backgroundColor: color.background, borderColor: color.border }]}
+
+            >
+                <View style={[styles.exportModalContainer, { backgroundColor: color.background, borderColor: color.border }]}>
+                    <Text style={[styles.exportModalTitle, { color: color.text }]}>Export As</Text>
+                    <TouchableOpacity
+                        style={[styles.exportModalBtn, { backgroundColor: color.card, borderColor: color.border }]}
+                        onPress={async () => { exportSnippetAsFile(snippet.title, snippet.content, 'js'), setExportModal(false) }}>
+                        <Text style={[styles.actionBtnText, { color: color.text }]}> Javascript</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.exportModalBtn, { backgroundColor: color.card, borderColor: color.border }]}
+                        onPress={async () => { exportSnippetAsFile(snippet.title, snippet.content, 'txt'), setExportModal(false) }}>
+                        <Text style={[styles.actionBtnText, { color: color.text }]}>Text</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.exportModalBtn, { backgroundColor: color.card, borderColor: color.border }]}
+                        onPress={async () => { exportSnippetAsFile(snippet.title, snippet.content, 'json'), setExportModal(false) }}>
+                        <Text style={[styles.actionBtnText, { color: color.text }]}> Json</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.exportModalBtn, { backgroundColor: color.card, borderColor: color.border }]}
+                        onPress={async () => { setExportModal(false) }}>
+                        <Text style={[styles.actionBtnText, { color: color.text }]}> Close</Text>
+                    </TouchableOpacity>
+                </View>
+
+            </Modal>
 
         </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
+    innerCodeBlock: {
+        padding: 14,
+        alignSelf: 'stretch',
+        width: '100%',
+        minWidth: '100%',
+    },
+
+    exportModalBtn: {
+
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: 12,
+        paddingVertical: 14,
+        paddingHorizontal: 20,
+        borderRadius: 16,
+        borderWidth: 1,
+        marginBottom: 10,
+        opacity: 0.9,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 10,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 2,
+
+    },
+    exportModalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    exportModalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+
+
     safeArea: {
         flex: 1,
     },
@@ -577,6 +674,8 @@ const styles = StyleSheet.create({
     },
 
     codeContainer: {
+        width: '100%',
+        minWidth: '100%',
         borderRadius: 14,
         borderWidth: 1,
         overflow: 'hidden',

@@ -3,8 +3,9 @@ import * as SecureStore from 'expo-secure-store'
 import { Alert } from 'react-native'
 
 const OPENROUTER_URI = "https://openrouter.ai/api/v1/chat/completions"
-const OPENROUTER_API_KEY = ""
-const MODEL = "minimax/minimax-m2.5:free"
+const OPENROUTER_API_KEY = "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"
+const MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
+//"minimax/minimax-m2.5:free"
 
 
 export const getAPIKEY = async (): Promise<string> => {
@@ -46,11 +47,11 @@ export const getAIResponse = async (action: AIAction, code: string, language: st
         if (getCachedKey) {
             return getCachedKey
         }
-
+        const apiKey = await getAPIKEY()
         const response = await fetch(OPENROUTER_URI, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${getAPIKEY()}`,
+                "Authorization": `Bearer ${apiKey}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
@@ -70,7 +71,7 @@ export const getAIResponse = async (action: AIAction, code: string, language: st
         }
 
         const responseData = await response.json()
-        const result = responseData[0].choices[0].message.content
+        const result = responseData.choices[0].message.content
 
         await AsyncStorage.setItem(`ai_${action}_${snippetId}`, result)
         return result

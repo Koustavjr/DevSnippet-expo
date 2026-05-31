@@ -107,9 +107,11 @@ export default function CreateSnippet() {
     const handleSubmit = async () => {
         if (!title.trim()) {
             Alert.alert('Title cannot be empty')
+            return
         }
-        if (content.trim()) {
+        if (!content.trim()) {
             Alert.alert('Content cannot be empty')
+            return
         }
 
         try {

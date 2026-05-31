@@ -105,7 +105,7 @@ const Favorites = () => {
 
 
     return (
-        <SafeAreaView style={styles.safeAreaView}>
+        <SafeAreaView style={[styles.safeAreaView, { backgroundColor: color.background }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}>
                 <Feather name="codesandbox" size={44} color={color.primary} />
                 <Text style={[styles.heading, { color: color.primary }]}>Favorites</Text>

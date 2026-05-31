@@ -189,7 +189,11 @@ const fileScreen = () => {
             case 'template': return 'package'
         }
     }
-
+    const EMPTY_MESSAGES = {
+        image: 'Attach screenshots to snippets to see them here',
+        code: 'Export snippets as files to see them here',
+        template: 'Download templates to see them here',
+    }
 
     const renderEmpty = () => (
         <View style={styles.emptyContainer}>
@@ -199,10 +203,13 @@ const fileScreen = () => {
             <Text style={[styles.emptyTitle, { color: color.text }]}>
                 No {TABS.find(t => t.type === activeTab)?.label}
             </Text>
-            <Text style={[styles.emptySubtitle, { color: color.placeholder }]}>
+            {/* <Text style={[styles.emptySubtitle, { color: color.placeholder }]}>
                 {activeTab === 'image' && 'Attach screenshots to snippets to see them here'}
                 {activeTab === 'code' && 'Export snippets as files to see them here'}
                 {activeTab === 'template' && 'Download templates to see them here'}
+            </Text> */}
+            <Text style={[styles.emptySubtitle, { color: color.placeholder }]}>
+                {EMPTY_MESSAGES[activeTab]}
             </Text>
         </View>
     )
@@ -216,7 +223,9 @@ const fileScreen = () => {
                     File Manager
                 </Text>
 
-                <TouchableOpacity style={[styles.downloadBtn, { backgroundColor: color.primary }]}>
+                <TouchableOpacity style={[styles.downloadBtn, { backgroundColor: color.primary }]}
+                    onPress={() => setShowDownlaodModal(true)}
+                >
                     <Feather name="download" size={18} color="#fff" />
                     <Text style={styles.downloadBtnText}>Download</Text>
                 </TouchableOpacity>
@@ -358,7 +367,7 @@ const fileScreen = () => {
             >
 
                 <TouchableOpacity style={styles.modalOverlay} onPress={() => setShowMoveSheet(false)} activeOpacity={1}>
-                    <View style={[styles.modalSheet, { backgroundColor: color.background, borderColor: color.border }]}>
+                    {/* <View style={[styles.modalSheet, { backgroundColor: color.background, borderColor: color.border }]}>
                         <View style={[styles.modalHandle, { backgroundColor: color.border }]} >
 
                             <Text style={[styles.modalTitle, { color: color.text }]}>
@@ -394,6 +403,48 @@ const fileScreen = () => {
 
                         </View>
 
+
+                    </View> */}
+
+                    <View style={[styles.modalSheet, { backgroundColor: color.background, borderColor: color.border }]}>
+
+
+                        <View style={[styles.modalHandle, { backgroundColor: color.border }]} />
+
+
+                        <Text style={[styles.modalTitle, { color: color.text }]}>
+                            {moveAction === 'move' ? 'Move to' : 'Copy to'}
+                        </Text>
+                        <Text style={[styles.modalSubtitle, { color: color.placeholder }]}>
+                            Select destination folder
+                        </Text>
+
+                        {(['exports', 'templates'] as Folder[])
+                            .filter(folder => {
+                                if (selectedFile?.type === 'code' && folder === 'exports') return false
+                                if (selectedFile?.type === 'template' && folder === 'templates') return false
+                                return true
+                            })
+                            .map(folder => (
+                                <TouchableOpacity
+                                    key={folder}
+                                    style={[styles.folderOption, { backgroundColor: color.card, borderColor: color.border }]}
+                                    onPress={() => handleMoveOrCopy(folder)}
+                                >
+                                    <View style={[styles.folderIconWrapper, { backgroundColor: color.primary + '15' }]}>
+                                        <Feather
+                                            name={folder === 'exports' ? 'file-text' : 'package'}
+                                            size={18}
+                                            color={color.primary}
+                                        />
+                                    </View>
+                                    <Text style={[styles.folderOptionText, { color: color.text }]}>
+                                        {folder.charAt(0).toUpperCase() + folder.slice(1)}
+                                    </Text>
+                                    <Feather name="chevron-right" size={16} color={color.placeholder} />
+                                </TouchableOpacity>
+                            ))
+                        }
 
                     </View>
 

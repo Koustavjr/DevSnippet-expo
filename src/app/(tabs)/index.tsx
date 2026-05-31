@@ -28,33 +28,33 @@ export default function Index() {
   const color = Colors[theme as keyof typeof Colors];
 
   const [snippets, setSnippets] = useState<Snippet[]>([
-    {
-      id: 1,
-      title: "Fetch API Wrapper",
-      content: "const fetchData = async (url) => {\n  const res = await fetch(url);\n  return res.json();\n};",
-      language: "javascript",
-      is_favorite: true,
-      created_at: new Date(),
-      updated_at: new Date(),
-    },
-    {
-      id: 2,
-      title: "Quick Sort Algorithm",
-      content: "def quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]",
-      language: "python",
-      is_favorite: false,
-      created_at: new Date(),
-      updated_at: new Date(),
-    },
-    {
-      id: 3,
-      title: "Drizzle Schema Join Query",
-      content: "SELECT s.title, t.name\nFROM snippets s\nINNER JOIN snippet_tags st ON s.id = st.snippet_id\nINNER JOIN tags t ON t.id = st.tag_id;",
-      language: "sql",
-      is_favorite: true,
-      created_at: new Date(),
-      updated_at: new Date(),
-    }
+    // {
+    //   id: 1,
+    //   title: "Fetch API Wrapper",
+    //   content: "const fetchData = async (url) => {\n  const res = await fetch(url);\n  return res.json();\n};",
+    //   language: "javascript",
+    //   is_favorite: true,
+    //   created_at: new Date(),
+    //   updated_at: new Date(),
+    // },
+    // {
+    //   id: 2,
+    //   title: "Quick Sort Algorithm",
+    //   content: "def quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]",
+    //   language: "python",
+    //   is_favorite: false,
+    //   created_at: new Date(),
+    //   updated_at: new Date(),
+    // },
+    // {
+    //   id: 3,
+    //   title: "Drizzle Schema Join Query",
+    //   content: "SELECT s.title, t.name\nFROM snippets s\nINNER JOIN snippet_tags st ON s.id = st.snippet_id\nINNER JOIN tags t ON t.id = st.tag_id;",
+    //   language: "sql",
+    //   is_favorite: true,
+    //   created_at: new Date(),
+    //   updated_at: new Date(),
+    // }
   ]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -136,8 +136,8 @@ export default function Index() {
           </View>
           <View>
             <Text style={[styles.headerSubtitle, { color: color.placeholder }]}>Welcome to</Text>
-            <Text style={[styles.logoText, { color: color.text }]}>
-              Dev<Text style={{ color: color.primary, fontWeight: '300' }}>Snippets</Text>
+            <Text style={[styles.logoText, { color: color.primary }]}>
+              Snip<Text style={{ color: color.text, fontWeight: '300' }}>Vault</Text>
             </Text>
           </View>
         </View>
